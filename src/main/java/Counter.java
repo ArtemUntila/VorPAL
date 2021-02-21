@@ -23,10 +23,10 @@ public class Counter {
 
     int fields = 0;
     int overrides = 0;
-    int classCounter = 0;
-    int counterA = 0;
-    int counterB = 0;
-    int counterC = 0;
+    int classes = 0;
+    int a = 0;
+    int b = 0;
+    int c = 0;
 
     public void parse() {
 
@@ -52,7 +52,7 @@ public class Counter {
             String name = tokens.get(i).getText();
 
             if (prevType.equals("CLASS") && type.equals("Identifier")) {
-                classCounter++;
+                classes++;
                 classBraces++;
                 System.out.println("classBraces = " + classBraces);
             }
@@ -69,12 +69,14 @@ public class Counter {
 
             //метрики
             if (metricA.contains(type))
-                counterA++;
+                a++;
             if (metricC.contains(type))
-                counterC++;
+                c++;
             if(type.equals("Identifier") && !prevType.equals("FUN")) {
                 String nextType = lexer.getVocabulary().getSymbolicName(tokens.get(i + 1).getType());
-                if (nextType.equals("LPAREN")) counterB++;
+                String nextName = tokens.get(i + 1).getText();
+                if (nextType.equals("LPAREN"))
+                    b++;
             }
 
             //переопределённые методы

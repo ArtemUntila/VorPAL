@@ -1,10 +1,7 @@
-import org.antlr.v4.runtime.*;
 import org.apache.tools.ant.DirectoryScanner;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Set;
 
 public class Main {
 
@@ -22,17 +19,34 @@ public class Main {
 
         String[] ktFiles = scanner.getIncludedFiles(); // тут должен быть foreach
 
+        int fields = 0;
+        int overrides = 0;
+        int classes = 0;
+        int a = 0;
+        int b = 0;
+        int c = 0;
+
         for (String ktFile : ktFiles) {
             File file = new File(project, ktFile);
             String path = file.getAbsolutePath();
             Counter counter = new Counter(path);
             counter.parse();
-            System.out.println("fields = " + counter.fields + "\n");
-            System.out.println("overrides = " + counter.overrides + "\n");
-            System.out.println("classes = " + counter.classCounter + "\n");
-            System.out.println("metricA = " + counter.counterA + "\n");
-            System.out.println("metricB = " + counter.counterB + "\n");
-            System.out.println("metricC = " + counter.counterC + "\n");
+            fields += counter.fields;
+            overrides += counter.overrides;
+            classes += counter.classes;
+            a += counter.a;
+            b += counter.b;
+            c += counter.c;
+            System.out.println("fields = " + fields + "\n");
+            System.out.println("overrides = " + overrides + "\n");
+            System.out.println("classes = " + classes + "\n");
+            System.out.println("metricA = " + a + "\n");
+            System.out.println("metricB = " + b + "\n");
+            System.out.println("metricC = " + c + "\n");
         }
+    }
+
+    public static void getParams() {
+
     }
 }
