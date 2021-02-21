@@ -1,16 +1,22 @@
-import org.apache.tools.ant.DirectoryScanner;
-
-import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
-    }
 
-    public static void getParams() {
+        if (args.length != 2)
+            throw new IllegalArgumentException("Incorrect data entered");
 
+        Params params = new Params(args[0]);
+        int maxDepth = params.maxDepth();
+        double avgDepth = params.avgDepth();
+        double metricABC = params.metricABC();
+        double avgOverrides = params.avgOverride();
+        double avgFields = params.avgFields();
+
+        Logger logger = new Logger(maxDepth, avgDepth, metricABC, avgOverrides, avgFields);
+
+        logger.console();
+        logger.log(args[1]);
     }
 }

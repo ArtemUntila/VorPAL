@@ -8,31 +8,29 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class SubCounter implements Counter {
+public class SubCounter { // счётчик параметров для одного .kt файла
 
-    private final CharStream charStream;
     private final KtLexer lexer;
     private final TokenStream tokens;
-    private final KtParser parser;
 
     public SubCounter(String path) throws IOException {
-        this.charStream = CharStreams.fromFileName(path);
+        CharStream charStream = CharStreams.fromFileName(path);
         this.lexer = new KtLexer(charStream);
         this.tokens = new CommonTokenStream(lexer);
-        this.parser = new KtParser(tokens);
+        KtParser parser = new KtParser(tokens);
         parser.kotlinFile();
     }
 
-    int fields = 0;
-    int overrides = 0;
-    int classes = 0;
-    int a = 0;
-    int b = 0;
-    int c = 0;
-    Map<String, String> map = new HashMap<>();
+    public int fields = 0; // кол-во полей
+    public int overrides = 0; // кол-во переопеределённых методов
+    public int classes = 0; // кол-во классов
+    public int a = 0; // метрика A
+    public int b = 0; // метрика B
+    public int c = 0; // метрика C
+    public Map<String, String> map = new HashMap<>(); // Map с узлами <Имя класса-наследника, Имя наследуемого класса>
 
-    @Override
     public void parse() {
+
         int braces = 0;
         int classBraces = 0;
         boolean classBody;
@@ -55,31 +53,36 @@ public class SubCounter implements Counter {
             String name = tokens.get(i).getText();
 
             if (prevType.equals("CLASS") && type.equals("Identifier")) {
+
                 classes++;
                 classBraces++;
-                System.out.println("classBraces = " + classBraces);
+
                 String nextType = lexer.getVocabulary().getSymbolicName(tokens.get(i + 1).getType());
                 if (nextType.equals("COLON")) {
                     String extendedClass = tokens.get(i + 2).getText();
                     map.put(name, extendedClass);
                 }
+
             }
 
             if (prevType.equals("LCURL"))
                 braces++;
+
             if (prevType.equals("RCURL")) {
                 braces--;
-                if (braces < classBraces) {
+                if (braces < classBraces)
                     classBraces = braces;
-                    System.out.println("classBraces changed and = " + classBraces);
-                }
             }
 
             //метрики
-            if (metricA.contains(type))
-                a++;
-            if (metricC.contains(type))
-                c++;
+            if (metricA.contains(type)) { // исключаются символы "=" при первом объявлении переменной val или var
+                String prev2Type = lexer.getVocabulary().getSymbolicName(tokens.get(i - 2).getType());
+                if ((!prev2Type.equals("VAL") && !prev2Type.equals("VAR")) && prevType.equals("Identifier"))
+                    a++;
+            }
+
+            if (metricC.contains(type)) c++;
+
             if(type.equals("Identifier") && !prevType.equals("FUN")) {
                 String nextType = lexer.getVocabulary().getSymbolicName(tokens.get(i + 1).getType());
                 if (nextType.equals("LPAREN"))
@@ -92,12 +95,12 @@ public class SubCounter implements Counter {
 
             //поля классов
             classBody = classBraces > 0 && braces == classBraces;
-            if (classBody && ((prevType.equals("VAL") || prevType.equals("VAR")) && type.equals("Identifier"))) {
+
+            if (classBody && ((prevType.equals("VAL") || prevType.equals("VAR")) && type.equals("Identifier")))
                 fields++;
-                System.out.println("Field: " + prevName + " " + name);
-            }
 
         }
+
     }
 
 }
