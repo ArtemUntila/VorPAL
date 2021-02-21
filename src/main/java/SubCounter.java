@@ -4,16 +4,18 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-public class Counter {
+public class SubCounter implements Counter {
 
     private final CharStream charStream;
     private final KtLexer lexer;
     private final TokenStream tokens;
     private final KtParser parser;
 
-    public Counter(String path) throws IOException {
+    public SubCounter(String path) throws IOException {
         this.charStream = CharStreams.fromFileName(path);
         this.lexer = new KtLexer(charStream);
         this.tokens = new CommonTokenStream(lexer);
@@ -27,9 +29,10 @@ public class Counter {
     int a = 0;
     int b = 0;
     int c = 0;
+    Map<String, String> map = new HashMap<>();
 
+    @Override
     public void parse() {
-
         int braces = 0;
         int classBraces = 0;
         boolean classBody;
@@ -55,6 +58,11 @@ public class Counter {
                 classes++;
                 classBraces++;
                 System.out.println("classBraces = " + classBraces);
+                String nextType = lexer.getVocabulary().getSymbolicName(tokens.get(i + 1).getType());
+                if (nextType.equals("COLON")) {
+                    String extendedClass = tokens.get(i + 2).getText();
+                    map.put(name, extendedClass);
+                }
             }
 
             if (prevType.equals("LCURL"))
@@ -74,7 +82,6 @@ public class Counter {
                 c++;
             if(type.equals("Identifier") && !prevType.equals("FUN")) {
                 String nextType = lexer.getVocabulary().getSymbolicName(tokens.get(i + 1).getType());
-                String nextName = tokens.get(i + 1).getText();
                 if (nextType.equals("LPAREN"))
                     b++;
             }
@@ -86,8 +93,8 @@ public class Counter {
             //поля классов
             classBody = classBraces > 0 && braces == classBraces;
             if (classBody && ((prevType.equals("VAL") || prevType.equals("VAR")) && type.equals("Identifier"))) {
-                    fields++;
-                    System.out.println("Field: " + prevName + " " + name);
+                fields++;
+                System.out.println("Field: " + prevName + " " + name);
             }
 
         }
