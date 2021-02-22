@@ -4,7 +4,7 @@ import java.util.Set;
 public class Depth { //глубина наследования
 
     private final Set<Map.Entry<String, String>> entries;
-    public final int[] array;
+    private final int[] array;
 
     public Depth (Map<String, String> map) {
         this.entries = map.entrySet();
@@ -30,5 +30,9 @@ public class Depth { //глубина наследования
                 depth(entry.getValue());
             }
         }
+    }
+
+    public int[] getArray() {
+        return array;
     }
 }

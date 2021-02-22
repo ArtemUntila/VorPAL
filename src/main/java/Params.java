@@ -9,13 +9,13 @@ public class Params { // выходные значения
         this.mainCounter = new MainCounter(path);
         mainCounter.parse();
 
-        this.depth = new Depth(mainCounter.map);
+        this.depth = new Depth(mainCounter.getMap());
         depth.depth();
     }
 
     public int maxDepth() {
         int max = 0;
-        for (int i : depth.array) {
+        for (int i : depth.getArray()) {
             if (i > max)
                 max = i;
         }
@@ -24,25 +24,25 @@ public class Params { // выходные значения
 
     public double avgDepth() {
         int sum = 0;
-        for (int i : depth.array) {
+        for (int i : depth.getArray()) {
             sum += i;
         }
-        return (double) sum / mainCounter.classes;
+        return (double) sum / mainCounter.classes();
     }
 
     public double metricABC() {
-        int a = mainCounter.a;
-        int b = mainCounter.b;
-        int c = mainCounter.c;
+        int a = mainCounter.a();
+        int b = mainCounter.b();
+        int c = mainCounter.c();
         return Math.sqrt(a * a + b * b + c * c);
     }
 
     public double avgOverride() {
-        return (double) mainCounter.overrides / mainCounter.classes;
+        return (double) mainCounter.overrides() / mainCounter.classes();
     }
 
     public double avgFields() {
-        return (double) mainCounter.fields / mainCounter.classes;
+        return (double) mainCounter.fields() / mainCounter.classes();
     }
 
 }

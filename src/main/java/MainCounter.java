@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainCounter { // счётчик параметров для всего проекта
+public class MainCounter extends Counter{ // счётчик параметров для всего проекта
 
     private final File project;
 
@@ -13,14 +13,15 @@ public class MainCounter { // счётчик параметров для все�
         this.project = new File(path);
     }
 
-    public int fields = 0; // кол-во полей
-    public int overrides = 0; // кол-во переопеределённых методов
-    public int classes = 0; // кол-во классов
-    public int a = 0; // метрика A
-    public int b = 0; // метрика B
-    public int c = 0; // метрика C
-    public Map<String, String> map = new HashMap<>(); // Map с узлами <Имя класса-наследника, Имя наследуемого класса>
+    private int fields = 0; // кол-во полей
+    private int overrides = 0; // кол-во переопеределённых методов
+    private int classes = 0; // кол-во классов
+    private int a = 0; // метрика A
+    private int b = 0; // метрика B
+    private int c = 0; // метрика C
+    private final Map<String, String> map = new HashMap<>(); // Map с узлами <Имя класса-наследника, Имя наследуемого класса>
 
+    @Override
     public void parse() throws IOException {
 
         if (!project.isDirectory() || !project.exists())
@@ -41,16 +42,51 @@ public class MainCounter { // счётчик параметров для все�
             SubCounter subCounter = new SubCounter(path);
             subCounter.parse();
 
-            fields += subCounter.fields;
-            overrides += subCounter.overrides;
-            classes += subCounter.classes;
-            a += subCounter.a;
-            b += subCounter.b;
-            c += subCounter.c;
-            map.putAll(subCounter.map);
+            fields += subCounter.fields();
+            overrides += subCounter.overrides();
+            classes += subCounter.classes();
+            a += subCounter.a();
+            b += subCounter.b();
+            c += subCounter.c();
+            map.putAll(subCounter.getMap());
 
         }
 
+    }
+
+    @Override
+    int fields() {
+        return fields;
+    }
+
+    @Override
+    int overrides() {
+        return overrides;
+    }
+
+    @Override
+    int classes() {
+        return classes;
+    }
+
+    @Override
+    int a() {
+        return a;
+    }
+
+    @Override
+    int b() {
+        return b;
+    }
+
+    @Override
+    int c() {
+        return c;
+    }
+
+    @Override
+    Map<String, String> getMap() {
+        return map;
     }
 
 }

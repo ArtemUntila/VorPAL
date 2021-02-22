@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class SubCounter { // счётчик параметров для одного .kt файла
+public class SubCounter extends Counter { // счётчик параметров для одного .kt файла
 
     private final KtLexer lexer;
     private final TokenStream tokens;
@@ -21,14 +21,15 @@ public class SubCounter { // счётчик параметров для одно
         parser.kotlinFile();
     }
 
-    public int fields = 0; // кол-во полей
-    public int overrides = 0; // кол-во переопеределённых методов
-    public int classes = 0; // кол-во классов
-    public int a = 0; // метрика A
-    public int b = 0; // метрика B
-    public int c = 0; // метрика C
-    public Map<String, String> map = new HashMap<>(); // Map с узлами <Имя класса-наследника, Имя наследуемого класса>
+    private int fields = 0; // кол-во полей
+    private int overrides = 0; // кол-во переопеределённых методов
+    private int classes = 0; // кол-во классов
+    private int a = 0; // метрика A
+    private int b = 0; // метрика B
+    private int c = 0; // метрика C
+    private final Map<String, String> map = new HashMap<>(); // Map с узлами <Имя класса-наследника, Имя наследуемого класса>
 
+    @Override
     public void parse() {
 
         int braces = 0;
@@ -48,7 +49,6 @@ public class SubCounter { // счётчик параметров для одно
         for (int i = 1; i < tokens.size(); i++) {
 
             String prevType = lexer.getVocabulary().getSymbolicName(tokens.get(i - 1).getType());
-            String prevName = tokens.get(i - 1).getText();
             String type = lexer.getVocabulary().getSymbolicName(tokens.get(i).getType());
             String name = tokens.get(i).getText();
 
@@ -58,9 +58,11 @@ public class SubCounter { // счётчик параметров для одно
                 classBraces++;
 
                 String nextType = lexer.getVocabulary().getSymbolicName(tokens.get(i + 1).getType());
-                if (nextType.equals("COLON")) {
+                if (nextType.equals("COLON") && i < tokens.size() - 3) {
                     String extendedClass = tokens.get(i + 2).getText();
-                    map.put(name, extendedClass);
+                    String typeL = lexer.getVocabulary().getSymbolicName(tokens.get(i + 3).getType());
+                    if (typeL.equals("LPAREN"))
+                        map.put(name, extendedClass);
                 }
 
             }
@@ -75,7 +77,7 @@ public class SubCounter { // счётчик параметров для одно
             }
 
             //метрики
-            if (metricA.contains(type)) { // исключаются символы "=" при первом объявлении переменной val или var
+            if (metricA.contains(type) && i > 1) { // исключаются символы "=" при первом объявлении переменной val или var
                 String prev2Type = lexer.getVocabulary().getSymbolicName(tokens.get(i - 2).getType());
                 if ((!prev2Type.equals("VAL") && !prev2Type.equals("VAR")) && prevType.equals("Identifier"))
                     a++;
@@ -83,7 +85,7 @@ public class SubCounter { // счётчик параметров для одно
 
             if (metricC.contains(type)) c++;
 
-            if(type.equals("Identifier") && !prevType.equals("FUN")) {
+            if(type.equals("Identifier") && !prevType.equals("FUN") && i < tokens.size() - 1) {
                 String nextType = lexer.getVocabulary().getSymbolicName(tokens.get(i + 1).getType());
                 if (nextType.equals("LPAREN"))
                     b++;
@@ -101,6 +103,41 @@ public class SubCounter { // счётчик параметров для одно
 
         }
 
+    }
+
+    @Override
+    int fields() {
+        return fields;
+    }
+
+    @Override
+    int overrides() {
+        return overrides;
+    }
+
+    @Override
+    int classes() {
+        return classes;
+    }
+
+    @Override
+    int a() {
+        return a;
+    }
+
+    @Override
+    int b() {
+        return b;
+    }
+
+    @Override
+    int c() {
+        return c;
+    }
+
+    @Override
+    Map<String, String> getMap() {
+        return map;
     }
 
 }

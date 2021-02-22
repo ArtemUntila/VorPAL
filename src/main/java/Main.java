@@ -1,6 +1,6 @@
 import java.io.IOException;
 
-public class Main {
+public class Main { // источник словаря : https://github.com/shadrina/kotlin-grammar-antlr4
 
     public static void main(String[] args) throws IOException {
 
