@@ -1,4 +1,4 @@
-
+// источник словаря : https://github.com/shadrina/kotlin-grammar-antlr4
 lexer grammar KtLexer;
 
 import KtUnicode;

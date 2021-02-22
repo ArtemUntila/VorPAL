@@ -35,6 +35,7 @@ public class SubCounter extends Counter { // счётчик параметров
         int braces = 0;
         int classBraces = 0;
         boolean classBody;
+        boolean classParam = false;
 
         Set<String> metricA = Set.of(
                 "ASSIGNMENT", "ADD_ASSIGNMENT", "SUB_ASSIGNMENT", "MULT_ASSIGNMENT", "DIV_ASSIGNMENT", "MOD_ASSIGNMENT",
@@ -65,7 +66,13 @@ public class SubCounter extends Counter { // счётчик параметров
                         map.put(name, extendedClass);
                 }
 
+                if (nextType.equals("LPAREN")) // исключаются параметры класса val и var
+                    classParam = true;
+
             }
+
+            if (type.equals("RPAREN") && classParam)
+                classParam = false;
 
             if (prevType.equals("LCURL"))
                 braces++;
@@ -85,7 +92,8 @@ public class SubCounter extends Counter { // счётчик параметров
 
             if (metricC.contains(type)) c++;
 
-            if(type.equals("Identifier") && !prevType.equals("FUN") && i < tokens.size() - 1) {
+            if(type.equals("Identifier") && i < tokens.size() - 1 &&
+                    !prevType.equals("FUN") && !prevType.equals("CLASS")) {
                 String nextType = lexer.getVocabulary().getSymbolicName(tokens.get(i + 1).getType());
                 if (nextType.equals("LPAREN"))
                     b++;
@@ -98,7 +106,8 @@ public class SubCounter extends Counter { // счётчик параметров
             //поля классов
             classBody = classBraces > 0 && braces == classBraces;
 
-            if (classBody && ((prevType.equals("VAL") || prevType.equals("VAR")) && type.equals("Identifier")))
+            if (classBody && !classParam &&
+                    ((prevType.equals("VAL") || prevType.equals("VAR")) && type.equals("Identifier")))
                 fields++;
 
         }

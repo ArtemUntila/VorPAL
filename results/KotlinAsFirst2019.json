@@ -1,7 +1,7 @@
 {
-  "maxDepth": 1,
-  "avgDepth": 0.029411764705882353,
-  "metricABC": 4318.525790127923,
+  "maxDepth": 0,
+  "avgDepth": 0.0,
+  "metricABC": 4292.3720714774945,
   "avgOverrides": 0.6176470588235294,
   "avgFields": 0.35294117647058826
 }
